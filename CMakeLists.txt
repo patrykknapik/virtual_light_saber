@@ -12,7 +12,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOUIC ON)
 
 # Widgets finds its own dependencies (QtGui and QtCore).
-find_package(Qt5Widgets REQUIRED PATHS $ENV{HOME}/Qt/5.10.0/clang_64)
+find_package(Qt5Widgets REQUIRED PATHS $ENV{HOME}/Qt/5.10.1/clang_64)
 
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)

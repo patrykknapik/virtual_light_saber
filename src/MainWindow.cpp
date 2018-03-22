@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent) {
     QTimer *timer = new QTimer(this);
 
     connect(timer, SIGNAL(timeout()), this, SLOT(updateAnimation()));
-    timer->start(100);
+    timer->start(80);
     rotation = 0;
 }
 
@@ -116,19 +116,20 @@ void MainWindow::paintGL() {
     glVertex3f(+1.0f, -1.0f, +1.0f); // 19
     glColor3f(+0.2f, +0.7f, +1.0f); // Colour
     glEnd();
+
     glBegin(GL_QUADS);
-    glVertex3f(+1.0f, -1.0f, -1.0f); // 20
-    glColor3f(+0.8f, +0.3f, +0.7f); // Colour
-    glVertex3f(-1.0f, -1.0f, -1.0f); // 21
-    glColor3f(+0.8f, +0.9f, +0.5f); // Colour
     glVertex3f(-1.0f, -1.0f, +1.0f); // 22
     glColor3f(+0.5f, +0.8f, +0.5f); // Colour
-    glVertex3f(+1.0f, -1.0f, +1.0f); // 23
+    glVertex3f(-1.0f, -1.0f, -1.0f); // 21
     glColor3f(+0.9f, +1.0f, +0.2f); // Colour
+    glVertex3f(+1.0f, -1.0f, -1.0f); // 20
+    glColor3f(+0.8f, +0.3f, +0.7f); // Colour
+    glVertex3f(+1.0f, -1.0f, +1.0f); // 23
+    glColor3f(+0.8f, +0.9f, +0.5f); // Colour
     glEnd();
 
     glFlush();
-    makeCurrent();
+    //makeCurrent();
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {
