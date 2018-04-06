@@ -14,39 +14,62 @@
 #include <OpenGL/glu.h>
 #include <GLUT/glut.h>
 #include <QTimer>
+#include <QHBoxLayout>
+#include <QvBoxLayout>
+#include <QGridLayout>
+#include "inc/ControlButton.h"
+#include "inc/AxisLabel.h"
+#include "inc/DescriptionLabel.h"
+#include <QLabel>
+#include <QGroupBox>
+#include <QStatusBar>
+#include "inc/ValueLabel.h"
 
-namespace Ui {
-    class MainWindow;
-}
-
-class MainWindow : public QOpenGLWindow {
+class MainWindow : public QMainWindow {
 Q_OBJECT
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
 
-    ~MainWindow();
+    ~MainWindow() override;
 
-protected:
-    virtual void initializeGL();
+private:
+    ValueLabel *XGyroValue = new ValueLabel(QString("0.0XG"));
+    ValueLabel *YGyroValue = new ValueLabel(QString("0.0YG"));
+    ValueLabel *ZGyroValue = new ValueLabel(QString("0.0ZG"));
 
-    virtual void resizeGL(int w, int h);
+    ValueLabel *XAccValue = new ValueLabel(QString("0.0XA"));
+    ValueLabel *YAccValue = new ValueLabel(QString("0.0YA"));
+    ValueLabel *ZAccValue = new ValueLabel(QString("0.0ZA"));
 
-    virtual void paintGL();
+    ValueLabel *XTranValue = new ValueLabel(QString("0.0XT"));
+    ValueLabel *YTranValue = new ValueLabel(QString("0.0YT"));
+    ValueLabel *ZTranValue = new ValueLabel(QString("0.0ZT"));
 
-    void resizeEvent(QResizeEvent *event);
-
-    void paintEvent(QPaintEvent *event);
+    ValueLabel *XRotValue = new ValueLabel(QString("0.0XR"));
+    ValueLabel *YRotValue = new ValueLabel(QString("0.0YR"));
+    ValueLabel *ZRotValue = new ValueLabel(QString("0.0ZR"));
 
 public slots:
 
-    void updateAnimation();
+    void rawData(qreal accData[3], qreal gyroData[3]);
+
+    void positionData(qreal tran[3], qreal rot[3]);
+
+    void resetPositionData();
 
 private:
-    float rotation;
-    QOpenGLContext *context;
-    QOpenGLFunctions *openGLFunctions;
+    QWidget *openGLSurfaceWidget = new QWidget;
 
+signals:
+
+    void invokeCharts();
+
+    void invokeSettings();
+
+    void quitApp();
+
+    void resetPosition();
 
 };
 
