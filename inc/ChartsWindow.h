@@ -9,6 +9,8 @@
 #include <QLineSeries>
 #include <QChartView>
 #include <QWidget>
+#include <QChart>
+#include "inc/DataTypes.h"
 
 class ChartsWindow : public QWidget {
 
@@ -20,6 +22,8 @@ public:
     ~ChartsWindow();
 
 private:
+    qreal range;
+
     QtCharts::QLineSeries *XgyroSeries = new QtCharts::QLineSeries;
     QtCharts::QLineSeries *YgyroSeries = new QtCharts::QLineSeries;
     QtCharts::QLineSeries *ZgyroSeries = new QtCharts::QLineSeries;
@@ -36,7 +40,7 @@ private:
 
 public slots:
 
-    void append(qreal accData[3], qreal gyroData[3]);
+    void append(MemsData::rawData data);
 
 };
 

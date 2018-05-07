@@ -7,30 +7,39 @@
 
 
 #include <QVBoxLayout>
-#include <QLineEdit>
+#include <QComboBox>
 #include <QString>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QPushButton>
+#include <QLabel>
+#include <QSerialPortInfo>
+#include <QList>
 
 class SettingsWindow : public QWidget {
 
 Q_OBJECT
 private:
-    QLineEdit *serialPortLineEdit = new QLineEdit("/serial/port/path");
+    QComboBox *serialPortEdit;
+    int portIndex;
+    QList<QSerialPortInfo> portsList;
+
+    void showEvent(QShowEvent *event) override;
 
 public:
     explicit SettingsWindow();
 
-    ~SettingsWindow();;
+    ~SettingsWindow();
 
 private slots:
 
     void gatherAndSend();
 
+    void serialPortPicked(int index);
+
 signals:
 
-    void newSerialPath(QString path);
+    void newSerialPort(QSerialPortInfo port);
 };
 
 

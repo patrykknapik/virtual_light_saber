@@ -3,11 +3,61 @@
 //
 
 
+#include <inc/DataTypes.h>
 #include "inc/MainWindow.h"
 
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
-    QStatusBar *statusBar = new QStatusBar;
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), rotation(0) {
+
+    Qt3DExtras::Qt3DWindow *view = new Qt3DExtras::Qt3DWindow();
+    view->defaultFrameGraph()->setClearColor(QColor(QRgb(0x2c3e50)));
+    QWidget *container = QWidget::createWindowContainer(view);
+    // Root entity
+    Qt3DCore::QEntity *rootEntity = new Qt3DCore::QEntity();
+
+    // Camera
+    Qt3DRender::QCamera *cameraEntity = view->camera();
+
+    cameraEntity->lens()->setPerspectiveProjection(45.0f, 16.0f / 9.0f, 0.1f, 1000.0f);
+    cameraEntity->setPosition(QVector3D(0, 20.0f, 0));
+    cameraEntity->setUpVector(QVector3D(0, 0, 1));
+    cameraEntity->setViewCenter(QVector3D(0, 0, 0));
+
+    Qt3DCore::QEntity *lightEntity = new Qt3DCore::QEntity(rootEntity);
+    Qt3DRender::QPointLight *light = new Qt3DRender::QPointLight(lightEntity);
+    light->setColor("white");
+    light->setIntensity(1);
+    lightEntity->addComponent(light);
+    Qt3DCore::QTransform *lightTransform = new Qt3DCore::QTransform(lightEntity);
+    lightTransform->setTranslation(cameraEntity->position());
+    lightEntity->addComponent(lightTransform);
+
+    // For camera controls
+    Qt3DExtras::QFirstPersonCameraController *camController = new Qt3DExtras::QFirstPersonCameraController(rootEntity);
+    camController->setCamera(cameraEntity);
+
+    Qt3DCore::QEntity *m_cuboidEntity;
+    // Cuboid shape data
+    Qt3DExtras::QCuboidMesh *cuboid = new Qt3DExtras::QCuboidMesh();
+
+    // CuboidMesh Transform
+    cuboidTransform->setScale(4.0f);
+    cuboidTransform->setTranslation(QVector3D(0.0f, 0.0f, 0.0f));
+
+    Qt3DExtras::QPhongMaterial *cuboidMaterial = new Qt3DExtras::QPhongMaterial();
+    cuboidMaterial->setDiffuse(QColor(QRgb(0xc0392b)));
+
+    //Cuboid
+    m_cuboidEntity = new Qt3DCore::QEntity(rootEntity);
+    m_cuboidEntity->addComponent(cuboid);
+    m_cuboidEntity->addComponent(cuboidMaterial);
+    m_cuboidEntity->addComponent(cuboidTransform);
+
+    // Set root object of the scene
+    view->setRootEntity(rootEntity);
+
+    //Widgets
+    statusBar = new QStatusBar;
 
     QSpacerItem *interObjectSpacer = new QSpacerItem(250, 10, QSizePolicy::Fixed, QSizePolicy::MinimumExpanding);
     QSpacerItem *interBoxSpacer = new QSpacerItem(250, 10, QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -42,7 +92,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     AxisLabel *YlabelPos = new AxisLabel(QString("Y:"));
     AxisLabel *ZlabelPos = new AxisLabel(QString("Z:"));
 
-    openGLSurfaceWidget->setMinimumSize(600, 600);
+    container->setMinimumSize(600, 600);
 
     rawDataLayout->addWidget(accDescription, 0, 1, Qt::AlignLeft);
     rawDataLayout->addWidget(gyroDescription, 0, 2, Qt::AlignLeft);
@@ -89,7 +139,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     dataControlsLayout->addWidget(resetPositionButton);
     dataControlsLayout->addWidget(endButton);
 
-    mainLayout->addWidget(openGLSurfaceWidget);
+    mainLayout->addWidget(container);
     mainLayout->addLayout(dataControlsLayout);
 
     centralWidget->setLayout(mainLayout);
@@ -116,25 +166,29 @@ MainWindow::~MainWindow() {
 
 }
 
-void MainWindow::rawData(qreal *accData, qreal *gyroData) {
-    XGyroValue->setText(QString("%1").arg(gyroData[0]));
-    YGyroValue->setText(QString("%1").arg(gyroData[1]));
-    ZGyroValue->setText(QString("%1").arg(gyroData[2]));
+void MainWindow::rawData(MemsData::rawData data) {
+    XGyroValue->setText(QString("%1").arg(data.X_G));
+    YGyroValue->setText(QString("%1").arg(data.Y_G));
+    ZGyroValue->setText(QString("%1").arg(data.Z_G));
 
-    XAccValue->setText(QString("%1").arg(accData[0]));
-    YAccValue->setText(QString("%1").arg(accData[1]));
-    ZAccValue->setText(QString("%1").arg(accData[2]));
+    XAccValue->setText(QString("%1").arg(data.X_XL));
+    YAccValue->setText(QString("%1").arg(data.Y_XL));
+    ZAccValue->setText(QString("%1").arg(data.Z_XL));
 
 }
 
-void MainWindow::positionData(qreal *tran, qreal *rot) {
-    XTranValue->setText(QString("%1").arg(tran[0]));
-    YTranValue->setText(QString("%1").arg(tran[1]));
-    ZTranValue->setText(QString("%1").arg(tran[2]));
+void MainWindow::posData(MemsData::posData data) {
+    XTranValue->setText(QString("%1").arg(data.X_tran));
+    YTranValue->setText(QString("%1").arg(data.Y_tran));
+    ZTranValue->setText(QString("%1").arg(data.Z_tran));
 
-    XRotValue->setText(QString("%1").arg(rot[0]));
-    YRotValue->setText(QString("%1").arg(rot[1]));
-    ZRotValue->setText(QString("%1").arg(rot[2]));
+    XRotValue->setText(QString("%1").arg(data.X_rot));
+    YRotValue->setText(QString("%1").arg(data.Y_rot));
+    ZRotValue->setText(QString("%1").arg(data.Z_rot));
+    cuboidTransform->setRotationX(data.X_rot);
+    cuboidTransform->setRotationY(data.Y_rot);
+    cuboidTransform->setRotationZ(data.Z_rot);
+    //cuboidTransform->setTranslation(QVector3D(data.X_tran,data.Y_tran,data.Z_tran));
 }
 
 void MainWindow::resetPositionData() {
@@ -145,5 +199,20 @@ void MainWindow::resetPositionData() {
     XRotValue->setText(QString("%1").arg(0));
     YRotValue->setText(QString("%1").arg(0));
     ZRotValue->setText(QString("%1").arg(0));
+    cuboidTransform->setRotationX(0.0);
+    cuboidTransform->setRotationY(0.0);
+    cuboidTransform->setRotationZ(0.0);
+    cuboidTransform->setTranslation(QVector3D(0.0f, 0.0f, 0.0f));
+
+}
+
+void MainWindow::closeEvent(QCloseEvent *event) {
+    emit quitApp();
+    QWidget::closeEvent(event);
+}
+
+void MainWindow::setSerialPort(QSerialPortInfo port) {
+    serialPort = port;
+    statusBar->showMessage(serialPort.portName());
 }
 

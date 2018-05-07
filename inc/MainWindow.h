@@ -7,12 +7,6 @@
 
 #include <QMainWindow>
 #include <QDebug>
-#include <QOpenGLWindow>
-#include <QSurfaceFormat>
-#include <QOpenGLFunctions>
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#include <GLUT/glut.h>
 #include <QTimer>
 #include <QHBoxLayout>
 #include <QvBoxLayout>
@@ -24,6 +18,12 @@
 #include <QGroupBox>
 #include <QStatusBar>
 #include "inc/ValueLabel.h"
+#include <Qt3DCore>
+#include <Qt3DExtras>
+#include <Qt3DInput>
+#include <QSerialPortInfo>
+#include "inc/DataTypes.h"
+
 
 class MainWindow : public QMainWindow {
 Q_OBJECT
@@ -34,6 +34,12 @@ public:
     ~MainWindow() override;
 
 private:
+    float rotation;
+    QSerialPortInfo serialPort;
+    QStatusBar *statusBar;
+
+    Qt3DCore::QTransform *cuboidTransform = new Qt3DCore::QTransform();
+
     ValueLabel *XGyroValue = new ValueLabel(QString("0.0XG"));
     ValueLabel *YGyroValue = new ValueLabel(QString("0.0YG"));
     ValueLabel *ZGyroValue = new ValueLabel(QString("0.0ZG"));
@@ -52,14 +58,16 @@ private:
 
 public slots:
 
-    void rawData(qreal accData[3], qreal gyroData[3]);
+    void rawData(MemsData::rawData data);
 
-    void positionData(qreal tran[3], qreal rot[3]);
+    void posData(MemsData::posData data);
 
     void resetPositionData();
 
+    void setSerialPort(QSerialPortInfo port);
+
 private:
-    QWidget *openGLSurfaceWidget = new QWidget;
+    void closeEvent(QCloseEvent *event) override;
 
 signals:
 
@@ -70,7 +78,6 @@ signals:
     void quitApp();
 
     void resetPosition();
-
 };
 
 

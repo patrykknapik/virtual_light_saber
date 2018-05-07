@@ -7,6 +7,6 @@
 ControlButton::~ControlButton() = default;
 
 ControlButton::ControlButton(const QString &labelText, QWidget *parent) : QPushButton(labelText, parent) {
-    setFixedSize(250, 60);
+    setFixedSize(250, 40);
     setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
 }
