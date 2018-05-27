@@ -5,6 +5,15 @@
 #include <inc/DataTypes.h>
 #include "inc/Calculator.h"
 
+/**
+* @brief Funkcja liczacza rotacje i translacje obiektu 3D.
+*
+* Funkcja ta calkuje za pomoca numerycznej calki trapezowej z wykorzystaniem chwilowego okresu czytania danych
+* odczyty z zyroskopu, a dokladnie predkosc katowa, dzieki temu uzyskiwana jest rotacja obiektu.
+* Rotacja jest emitowana w postaci sygnalu.
+ * Translacja narazie nie jest obliczana.
+*
+*/
 
 void Calculator::rawData(MemsData::rawData data) {
 
